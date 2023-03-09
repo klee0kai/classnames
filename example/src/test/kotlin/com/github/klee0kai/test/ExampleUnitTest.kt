@@ -1,13 +1,19 @@
 package com.github.klee0kai.test
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.github.klee0kai.example.Main
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
 class ExampleUnitTest {
 
     @Test
-    fun simpleTest() {
-        assertEquals(4, 2 + 2)
+    fun sayHello() {
+        Main.sayHello()
+    }
+
+    @Test
+    fun someClassIsObfuscated() {
+        assertNotEquals("com.github.klee0kai.example.SomeClass", Main.someClassProxy.canonicalName)
     }
 
 }

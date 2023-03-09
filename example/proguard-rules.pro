@@ -21,6 +21,13 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# keep main entry
 -keep public class com.github.klee0kai.example.Main {
   public *;
 }
+
+# keep all tests files
+-keep public class com.github.klee0kai.test.** {
+  public *;
+}
+
