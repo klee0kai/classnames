@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ClassNames"
 include("example")
+include("classnames_processor")
