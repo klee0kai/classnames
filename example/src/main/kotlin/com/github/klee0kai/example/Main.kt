@@ -1,11 +1,13 @@
 package com.github.klee0kai.example
 
+import com.github.klee0kai.example.obfuscating.TargetClass
+
 object Main {
 
-    val someClassProxy = SomeClass::class.java
+    val targetClassProxy = TargetClass::class.java
 
     fun sayHello() {
-        SomeClass().sayHello()
+        TargetClass().sayHello()
     }
 
     @JvmStatic

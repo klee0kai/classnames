@@ -1,11 +1,11 @@
-package com.github.klee0kai.example
+package com.github.klee0kai.example.obfuscating
 
 import com.github.klee0kai.classnames.ClassNames
 import java.net.URISyntaxException
 
 
 @ClassNames(indexMethods = true)
-class SomeClass {
+class TargetClass : ParentClass() {
 
     fun sayHello() {
         println("Hello from ${this.javaClass}")

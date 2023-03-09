@@ -13,7 +13,7 @@ class ExampleUnitTest {
 
     @Test
     fun someClassIsObfuscated() {
-        assertNotEquals("com.github.klee0kai.example.SomeClass", Main.someClassProxy.canonicalName)
+        assertNotEquals("com.github.klee0kai.example.obfuscating.SomeClass", Main.targetClassProxy.canonicalName)
     }
 
 }
