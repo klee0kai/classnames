@@ -2,7 +2,7 @@ import proguard.gradle.ProGuardTask
 
 plugins {
     kotlin("jvm")
-    id("com.dorongold.task-tree") version "2.1.1"
+    kotlin("kapt")
 }
 
 
@@ -31,8 +31,8 @@ val obfuscateTask = tasks.register<ProGuardTask>("obfuscate") {
     dependsOn(tasks.findByName("jarMain"))
 
     configuration("proguard-rules.pro")
-    injars(layout.buildDirectory.file("libs/example-packed.jar"))
-    outjars(layout.buildDirectory.file("libs/example-obfuscated.jar"))
+    injars(files("build/libs/example-packed.jar"))
+    outjars(files("build/libs/example-obfuscated.jar"))
 }
 
 tasks.register<Test>("test_non_obfuscated") {
@@ -62,7 +62,9 @@ tasks.getByName<Test>("test") {
 
 
 dependencies {
-    testImplementation(layout.buildDirectory.files("libs/example.jar"))
+    kapt(project(":classnames_processor"))
+    implementation(project(":classnames"))
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }

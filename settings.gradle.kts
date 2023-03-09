@@ -17,5 +17,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ClassNames"
-include("example")
+include("classnames")
 include("classnames_processor")
+include("example")

@@ -1,8 +1,10 @@
 package com.github.klee0kai.example
 
+import com.github.klee0kai.classnames.ClassNames
 import java.net.URISyntaxException
 
 
+@ClassNames(indexMethods = true)
 class SomeClass {
 
     fun sayHello() {
