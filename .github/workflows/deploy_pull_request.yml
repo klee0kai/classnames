@@ -1,9 +1,25 @@
-name: Deploy Button
+name: Deploy Pull Request
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
+  wf_meta:
+    name: Workflow Metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Github Object
+        continue-on-error: true
+        run: echo ${{ toJSON(github) }} > github.json
+      - name: Upload Meta artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wf-meta
+          path: |
+            github.json 
+            
+
   tests:
     name: Run Unit Tests
     runs-on: ubuntu-latest
@@ -27,26 +43,6 @@ jobs:
           path: |
             ./**/build/reports
             ./**/build/test-results
-
-  dorny_report:
-    name: Prepare Dorny Test Report
-    needs: tests
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download Test Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: test-report
-
-      - name: Publish Dorny Test Report
-        uses: dorny/test-reporter@v1
-        with:
-          name: Dorny JUnit Test Report
-          path: '**/build/test-results/**/*.xml'
-          reporter: java-junit
-          list-tests: 'all'
 
   mikepenz_report:
     name: Prepare Mikepenz Test Report
