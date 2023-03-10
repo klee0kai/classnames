@@ -48,3 +48,18 @@ class ExampleUnitTest {
         assertNull(String::class.java.findCompileClassname())
     }
 }
+
+private fun String.xorToBytes(that: String) =
+    mapIndexed { index, c ->
+        that[index.mod(that.length)].code.xor(c.code)
+    }.joinToString(separator = "") {
+        it.toChar().toString()
+    }.toByteArray()
+
+
+private fun ByteArray.xorToString(that: String) =
+    mapIndexed { index, c ->
+        that[index.mod(that.length)].code.xor(c.toInt())
+    }.joinToString(separator = "") {
+        it.toChar().toString()
+    }
