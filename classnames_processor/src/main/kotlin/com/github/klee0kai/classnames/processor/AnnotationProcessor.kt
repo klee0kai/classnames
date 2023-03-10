@@ -1,7 +1,7 @@
 package com.github.klee0kai.classnames.processor
 
 import com.github.klee0kai.classnames.ClassNames
-import com.github.klee0kai.classnames.processor.codegen.ClassNameStoreBuilder
+import com.github.klee0kai.classnames.processor.codegen.genClassNameStore
 import com.github.klee0kai.classnames.processor.model.toClassDetail
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.ClassName
@@ -26,10 +26,10 @@ class AnnotationProcessor : AbstractProcessor() {
             (element as? TypeElement)?.toClassDetail()
         }
 
-        val clIndexBuilder = ClassNameStoreBuilder(ClassName("com.github.klee0kai.classnames", "ClNamesStore"))
-        classes.forEach { clIndexBuilder.indexNewClass(it) }
-        clIndexBuilder.build()
-
+        genClassNameStore(
+            classname = ClassName("com.github.klee0kai.classnames", "ClNamesStore"),
+            indexedClasses = classes
+        )
 
         return true
     }
