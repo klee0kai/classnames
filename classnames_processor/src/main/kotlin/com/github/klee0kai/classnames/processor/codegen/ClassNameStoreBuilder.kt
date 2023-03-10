@@ -65,7 +65,7 @@ fun genClassNameStore(
 
 
 
-        genFun("classnameOfName") {
+        genFun("findCompileClassname") {
             addKdoc("Get Class of canonicalName. Saved in compile time")
             receiver(strType)
             returns(clEntryType.copy(true))
@@ -74,7 +74,7 @@ fun genClassNameStore(
             addStatement("return index?.let{ %T.clEntries[it] }", classname);
         }
 
-        genFun("classnameOfClass") {
+        genFun("findCompileClassname") {
             addKdoc("Get canonicalName of class. Saved in compile time")
             receiver(clType)
             returns(clEntryType.copy(true))

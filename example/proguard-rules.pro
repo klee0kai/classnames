@@ -26,6 +26,11 @@
   public *;
 }
 
+-keep public class com.github.klee0kai.classnames.** {
+  public *;
+}
+
+
 # keep all tests files
 -keep public class com.github.klee0kai.test.** {
   public *;
