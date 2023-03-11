@@ -1,5 +1,8 @@
 package com.github.klee0kai.classnames.processor.codegen
 
+import com.github.klee0kai.classnames.processor.helpers.xorToBytes
+import com.github.klee0kai.classnames.processor.helpers.xorToBytesFun
+import com.github.klee0kai.classnames.processor.helpers.xorToStringFun
 import com.github.klee0kai.classnames.processor.model.ClassDetail
 import com.github.klee0kai.classnames.processor.poet.*
 import com.squareup.kotlinpoet.*
@@ -43,23 +46,23 @@ fun genClassNameStore(
 
             genProperty(
                 name = "names",
-                type = Map::class.asClassName().parameterizedBy(ByteArray::class.asTypeName(), Int::class.asTypeName())
+                type = Map::class.asClassName().parameterizedBy(Int::class.asTypeName(), Int::class.asTypeName())
             ) {
                 initializer(
                     "mapOf(\n %L )",
                     indexedClasses.mapIndexed { index, it ->
-                        CodeBlock.of("%L to $index \n", it.className.canonicalName.xorToBytes(mask).initCodeBlock())
+                        CodeBlock.of("${it.className.canonicalName.hashCode()} to $index \n")
                     }.toCodeBlock()
                 )
             }
             genProperty(
                 name = "classes",
-                type = Map::class.asClassName().parameterizedBy(clType, Int::class.asTypeName())
+                type = Map::class.asClassName().parameterizedBy(Int::class.asTypeName(), Int::class.asTypeName())
             ) {
                 initializer(
                     "mapOf(\n %L )",
                     indexedClasses.mapIndexed { index, it ->
-                        CodeBlock.of("%T::class.java to $index \n", it.className)
+                        CodeBlock.of("%T::class.java.hashCode() to $index \n", it.className)
                     }.toCodeBlock()
                 )
             }
@@ -93,7 +96,7 @@ fun genClassNameStore(
             receiver(strType)
             returns(clEntryType.copy(true))
 
-            addStatement("val index = %T.names.getOrDefault(this.xorToBytes(%T.mask), null)", classname, classname)
+            addStatement("val index = %T.names.getOrDefault(hashCode(), null)", classname)
             addStatement("return index?.let{ %T.clEntries[it] }", classname);
         }
 
@@ -102,62 +105,20 @@ fun genClassNameStore(
             receiver(clType)
             returns(clEntryType.copy(true))
 
-            addStatement("val index = %T.classes.getOrDefault(this, null)", classname)
+            addStatement("val index = %T.classes.getOrDefault(hashCode() , null)", classname)
             addStatement("return index?.let{ %T.clEntries[it] }", classname);
         }
 
         genFun("xorToString") {
-            addModifiers(KModifier.PRIVATE)
-            receiver(ByteArray::class)
-            addParameter("that", String::class)
-            returns(String::class)
-
-            addCode(
-                """
-                | return mapIndexed { index, c ->
-                |     that[index.mod(that.length)].code.xor(c.toInt())
-                | }.joinToString(separator = "") {
-                |     it.toChar().toString()
-                | }
-                """.trimMargin()
-            )
+            xorToStringFun()
         }
 
         genFun("xorToBytes") {
-            addModifiers(KModifier.PRIVATE)
-            receiver(String::class)
-            addParameter("that", String::class)
-            returns(ByteArray::class)
-
-            addCode(
-                """
-                | return mapIndexed { index, c ->
-                |     that[index.mod(that.length)].code.xor(c.code)
-                | }.joinToString(separator = "") {
-                |     it.toChar().toString()
-                | }.toByteArray()
-                """.trimMargin()
-            )
+            xorToBytesFun()
         }
     }
 
 }
-
-
-private fun String.xorToBytes(that: String) =
-    mapIndexed { index, c ->
-        that[index.mod(that.length)].code.xor(c.code)
-    }.joinToString(separator = "") {
-        it.toChar().toString()
-    }.toByteArray()
-
-
-private fun ByteArray.xorToString(that: String) =
-    mapIndexed { index, c ->
-        that[index.mod(that.length)].code.xor(c.toInt())
-    }.joinToString(separator = "") {
-        it.toChar().toString()
-    }
 
 
 private fun ByteArray.initCodeBlock() =
