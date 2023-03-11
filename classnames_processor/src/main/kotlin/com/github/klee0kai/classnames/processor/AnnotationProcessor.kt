@@ -2,7 +2,7 @@ package com.github.klee0kai.classnames.processor
 
 import com.github.klee0kai.classnames.ClassNames
 import com.github.klee0kai.classnames.processor.codegen.genClassNameStore
-import com.github.klee0kai.classnames.processor.model.toClassDetail
+import com.github.klee0kai.classnames.processor.model.classdetails.toClassDetail
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.ClassName
 import javax.annotation.processing.*
@@ -28,7 +28,7 @@ class AnnotationProcessor : AbstractProcessor() {
 
         genClassNameStore(
             classname = ClassName("com.github.klee0kai.classnames", "ClNamesStore"),
-            indexedClasses = classes
+            collectClasses = classes
         )
 
         return true

@@ -1,4 +1,4 @@
-package com.github.klee0kai.classnames.processor.helpers
+package com.github.klee0kai.classnames.processor.ext
 
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier

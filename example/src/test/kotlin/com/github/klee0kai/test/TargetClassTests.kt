@@ -5,9 +5,9 @@ import com.github.klee0kai.example.Main
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class ExampleUnitTest {
+class TargetClassTests {
 
-    val targetClName = "com.github.klee0kai.example.obfuscating.TargetClass"
+    private val targetClName = "com.github.klee0kai.example.obfuscating.TargetClass"
 
     @Test
     fun sayHello() {
@@ -15,7 +15,7 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun someClassIsObfuscated() {
+    fun classIsObfuscated() {
         assertNotEquals(targetClName, Main.targetClassProxy.canonicalName)
     }
 
@@ -42,6 +42,7 @@ class ExampleUnitTest {
         assertEquals(Main.targetClassProxy, clEntry?.cl)
     }
 
+
     @Test
     fun crashChecks() {
         assertNull("olla".findCompileClassname())
@@ -49,17 +50,3 @@ class ExampleUnitTest {
     }
 }
 
-private fun String.xorToBytes(that: String) =
-    mapIndexed { index, c ->
-        that[index.mod(that.length)].code.xor(c.code)
-    }.joinToString(separator = "") {
-        it.toChar().toString()
-    }.toByteArray()
-
-
-private fun ByteArray.xorToString(that: String) =
-    mapIndexed { index, c ->
-        that[index.mod(that.length)].code.xor(c.toInt())
-    }.joinToString(separator = "") {
-        it.toChar().toString()
-    }

@@ -4,7 +4,7 @@ import com.github.klee0kai.classnames.ClassNames
 import java.net.URISyntaxException
 
 
-@ClassNames(indexMethods = true)
+@ClassNames(indexParents = true)
 class TargetClass : ParentClass() {
 
     fun sayHello() {

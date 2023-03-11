@@ -3,12 +3,17 @@ package com.github.klee0kai.classnames
 import java.lang.annotation.*
 
 
+/**
+ * Collect class compile meta
+ *  - classnames
+ */
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
 @Target(allowedTargets = [AnnotationTarget.CLASS, AnnotationTarget.TYPE])
 annotation class ClassNames(
+
     /**
-     * Collect also original method names
+     * Collect also parents compile meta
      */
-    val indexMethods: Boolean
+    val indexParents: Boolean
 )

@@ -1,9 +1,10 @@
 package com.github.klee0kai.classnames.processor.codegen
 
-import com.github.klee0kai.classnames.processor.helpers.xorToBytes
-import com.github.klee0kai.classnames.processor.helpers.xorToBytesFun
-import com.github.klee0kai.classnames.processor.helpers.xorToStringFun
-import com.github.klee0kai.classnames.processor.model.ClassDetail
+import com.github.klee0kai.classnames.processor.ext.xorToBytes
+import com.github.klee0kai.classnames.processor.ext.xorToBytesFun
+import com.github.klee0kai.classnames.processor.ext.xorToStringFun
+import com.github.klee0kai.classnames.processor.model.classdetails.ClassDetail
+import com.github.klee0kai.classnames.processor.model.classdetails.getAllParents
 import com.github.klee0kai.classnames.processor.poet.*
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -12,12 +13,19 @@ import java.util.*
 
 fun genClassNameStore(
     classname: ClassName,
-    indexedClasses: List<ClassDetail>
+    collectClasses: List<ClassDetail>
 ) {
     val clType = Class::class.asClassName().parameterizedBy(STAR)
     val strType = String::class.asTypeName()
     val clEntryType = ClassName(classname.packageName, "ClEntry")
     val mask = UUID.randomUUID().toString()
+    val allIndexClasses = collectClasses.flatMap {
+        if (it.clNamesAnn?.indexParent == true) {
+            it.getAllParents(false)
+        } else {
+            listOf(it)
+        }
+    }
 
     genKtFile(classname.packageName, classname.simpleName) {
         genLibComment()
@@ -33,9 +41,9 @@ fun genClassNameStore(
             ) {
                 initializer(
                     "listOf(\n %L )",
-                    indexedClasses.map {
+                    allIndexClasses.map {
                         CodeBlock.of(
-                            "%T(%L,%T::class.java)\n",
+                            "%T(%L,%T::class.java),\n",
                             clEntryType,
                             it.className.canonicalName.xorToBytes(mask).initCodeBlock(),
                             it.className
@@ -50,8 +58,8 @@ fun genClassNameStore(
             ) {
                 initializer(
                     "mapOf(\n %L )",
-                    indexedClasses.mapIndexed { index, it ->
-                        CodeBlock.of("${it.className.canonicalName.hashCode()} to $index \n")
+                    allIndexClasses.mapIndexed { index, it ->
+                        CodeBlock.of("${it.className.canonicalName.hashCode()} to $index,\n")
                     }.toCodeBlock()
                 )
             }
@@ -61,8 +69,8 @@ fun genClassNameStore(
             ) {
                 initializer(
                     "mapOf(\n %L )",
-                    indexedClasses.mapIndexed { index, it ->
-                        CodeBlock.of("%T::class.java.hashCode() to $index \n", it.className)
+                    allIndexClasses.mapIndexed { index, it ->
+                        CodeBlock.of("%T::class.java.hashCode() to $index,\n", it.className)
                     }.toCodeBlock()
                 )
             }
@@ -97,7 +105,7 @@ fun genClassNameStore(
             returns(clEntryType.copy(true))
 
             addStatement("val index = %T.names.getOrDefault(hashCode(), null)", classname)
-            addStatement("return index?.let{ %T.clEntries[it] }", classname);
+            addStatement("return index?.let{ %T.clEntries[it] }", classname)
         }
 
         genFun("findCompileClassname") {
@@ -106,7 +114,7 @@ fun genClassNameStore(
             returns(clEntryType.copy(true))
 
             addStatement("val index = %T.classes.getOrDefault(hashCode() , null)", classname)
-            addStatement("return index?.let{ %T.clEntries[it] }", classname);
+            addStatement("return index?.let{ %T.clEntries[it] }", classname)
         }
 
         genFun("xorToString") {
